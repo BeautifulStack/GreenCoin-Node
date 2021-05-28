@@ -22,3 +22,5 @@ class Blockchain:
         self.chain = chain["chain"]
         self.last_block_hash = base64.b64encode(hashlib.sha256(json.dumps(self.chain[0]).encode()).digest()).decode()
 
+    def get_chain(self):
+        return json.dumps({'length': self.length, 'chain': self.chain})
