@@ -12,15 +12,13 @@ class KeyPair:
     signer = None
 
     def __init__(self):
-        self.__get_keys()
-
-    def __get_keys(self):
         if path.exists("data/private.key"):
             with open("data/private.key", "r") as f:
                 try:
                     self.__private_key = RSA.import_key(f.read())
                 except ValueError:
                     print("ERR: Corrupted key, delete data folder to generate a new key (CAUTION)")
+                    exit(1)
 
                 self.__public_key = self.__private_key.public_key()
                 self.signer = pkcs1_15.new(self.__private_key)
@@ -39,6 +37,7 @@ class KeyPair:
             f.write(self.__private_key.export_key("PEM"))
 
     def sign(self, string):
+        # todo: signature process, must return str
         pass
 
     def display(self):

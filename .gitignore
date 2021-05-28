@@ -141,4 +141,5 @@ cython_debug/
 .idea/
 
 # GreenCoin
-data/
+data/private.key
+data/chain.json

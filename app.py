@@ -1,10 +1,11 @@
 from flask import Flask
-from utils.Keys import KeyPair
+from utils.keys import KeyPair
+from utils.blockchain import Blockchain
 
 app = Flask(__name__)
 
 keys = KeyPair()
-keys.display()
+blockchain = Blockchain()
 
 
 @app.route('/')
