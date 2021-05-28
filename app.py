@@ -1,6 +1,10 @@
 from flask import Flask
+from utils.Keys import KeyPair
 
 app = Flask(__name__)
+
+keys = KeyPair()
+keys.display()
 
 
 @app.route('/')
