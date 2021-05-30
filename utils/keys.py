@@ -36,8 +36,8 @@ class KeyPair:
         with open("data/private.key", "wb") as f:
             f.write(self.__private_key.export_key("PEM"))
 
-    def sign(self, string):
-        # todo: signature process, must return str
+    def sign(self, string) -> str:
+        # TODO: signature process
         pass
 
     def display(self):

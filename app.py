@@ -27,6 +27,7 @@ def get_balance(address: str):
     return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
 
 
+# TODO: remove this for production
 @app.post('/test')
 def test():
     data = request.get_json()
