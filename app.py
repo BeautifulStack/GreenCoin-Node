@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from utils.keys import KeyPair
 from utils.blockchain import Blockchain
 
@@ -19,16 +19,19 @@ def get_chain():
 
 @app.post('/new_transaction')
 def new_transaction():
-    """
-    Takes form-data encoding for now, may switch to JSON later
-    """
-
-    return blockchain.new_transaction(request.form)
+    return blockchain.new_transaction(request.get_json())
 
 
-@app.get('/balance/<address:str>')
+@app.get('/balance/<address>')
 def get_balance(address: str):
     return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
+
+
+@app.post('/test')
+def test():
+    data = request.get_json()
+    t = jsonify(data)
+    return data["tr"]["tr1"]
 
 
 if __name__ == '__main__':

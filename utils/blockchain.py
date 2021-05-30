@@ -45,16 +45,17 @@ class Blockchain:
         if funds < 0:
             return {"error": "Not enough funds"}, 400, {'Content-Type': 'application/json'}
 
+        # We're good, add transaction to queue
         self.__open_transaction.append(transaction)
 
-        return {"new_balance": funds}, 200, {'Content-Type': 'application/json'}
+        # return {"new_balance": funds}, 200, {'Content-Type': 'application/json'}
+        return "ok"
 
     @staticmethod
     def __check_body_transaction(body):
         condition = "transaction" in body and "signature" in body and "public_key" in body
         if condition:
-            transaction = json.loads(body["transaction"])
-            print(transaction)
+            transaction = body["transaction"]
             condition = ("sender" in transaction and
                          "receiver" in transaction and
                          "amount" in transaction and
