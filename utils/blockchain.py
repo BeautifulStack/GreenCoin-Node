@@ -145,4 +145,7 @@ class Blockchain:
             self.__last_block_hash = sha256(json.dumps(bloc))
             self.__open_transactions = []
 
+            with open(self.__node.chain_path, "w") as f:
+                f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
+
             print(f"New block : {bloc['index']}")
