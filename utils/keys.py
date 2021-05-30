@@ -30,9 +30,6 @@ class KeyPair:
         self.__public_key = self.__private_key.public_key()
         self.signer = pkcs1_15.new(self.__private_key)
 
-        if not path.exists("data"):
-            mkdir("data", 0o777)
-
         with open("data/private.key", "wb") as f:
             f.write(self.__private_key.export_key("PEM"))
 

@@ -1,12 +1,12 @@
 import base64
 import time
+import json
 from os import path
 from utils.hash import *
 from threading import Thread
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
-from Crypto.Hash import SHA256
 
 
 class Blockchain:
@@ -27,7 +27,7 @@ class Blockchain:
         self.__length = chain["length"]
         self.__chain = chain["chain"]
         self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
-        self.__last_block_hash = sha256_dict(self.__chain[-1])
+        self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
 
         miner = Thread(target=self.__mine, daemon=True)
         miner.start()
@@ -80,7 +80,7 @@ class Blockchain:
         except ValueError:
             return False
 
-        address = ripemd160(sha256_str(public_key))
+        address = ripemd160(sha256(public_key))
         if address != sender:
             return False
 
@@ -121,15 +121,13 @@ class Blockchain:
 
     def __mine(self):
         while True:
-            time.sleep(60)  # start
+            time.sleep(60)
 
             if not self.__open_transactions:
                 continue
 
-            print("DEBUG")
-
             for i, tx in enumerate(self.__open_transactions):
-                tx["index"] = self.__tx_length + i+1
+                tx["index"] = self.__tx_length + (i+1)
 
             bloc = {
                 "index": self.__length,
@@ -141,27 +139,7 @@ class Blockchain:
             self.__chain.append(bloc)
             self.__length += 1
             self.__tx_length += len(self.__open_transactions)
-            self.__last_block_hash = sha256_dict(bloc)
+            self.__last_block_hash = sha256(json.dumps(bloc))
             self.__open_transactions = []
 
-            print("New block : " + str(bloc["index"]))
-
-    """@staticmethod
-    def very_authenticity(sender: str, public_key: str, signature: str, msg: str):
-        try:
-            key = RSA.import_key(base64.b64decode(public_key))
-        except ValueError:
-            return public_key
-
-        address = ripemd160(sha256_str(public_key))
-        if address != sender:
-            return "hash"
-
-        decoded_sig = base64.b64decode(signature)
-        h = SHA256.new(msg.encode())
-        try:
-            pkcs1_15.new(key).verify(h, decoded_sig)
-        except ValueError:
-            return "sig"
-
-        return "ok" """
+            print(f"New block : {bloc['index']}")

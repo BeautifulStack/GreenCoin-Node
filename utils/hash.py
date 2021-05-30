@@ -1,16 +1,8 @@
-import hashlib
-import json
-
-from Crypto.Hash import RIPEMD160
+from Crypto.Hash import RIPEMD160, SHA256
 
 
-def sha256_dict(bloc: dict) -> str:
-    result = hashlib.sha256(json.dumps(bloc).encode()).hexdigest()
-    return result
-
-
-def sha256_str(key: str) -> str:
-    return hashlib.sha256(key.encode()).hexdigest()
+def sha256(key: str) -> str:
+    return SHA256.new(key.encode()).hexdigest()
 
 
 def ripemd160(key: str) -> str:

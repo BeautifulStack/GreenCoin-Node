@@ -1,6 +1,4 @@
-import json
-
-from flask import Flask, request, jsonify
+from flask import Flask, request
 from utils.keys import KeyPair
 from utils.blockchain import Blockchain
 
@@ -32,18 +30,6 @@ def get_balance(address: str):
 @app.get('/open_transactions')
 def get_open_transactions():
     return {"open_transactions": blockchain.get_open_transactions()}, 200, {'Content-Type': 'application/json'}
-
-
-# TODO: remove this for production
-@app.post('/test')
-def test():
-    data = request.get_json()
-    return Blockchain.very_authenticity(
-        data["transaction"]["sender"],
-        data["public_key"],
-        data["signature"],
-        json.dumps(data["transaction"])
-    )
 
 
 if __name__ == '__main__':
