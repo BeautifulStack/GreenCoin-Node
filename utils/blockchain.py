@@ -121,7 +121,7 @@ class Blockchain:
 
     def __mine(self):
         while True:
-            time.sleep(20)  # start
+            time.sleep(60)  # start
 
             if not self.__open_transactions:
                 continue
@@ -146,7 +146,7 @@ class Blockchain:
 
             print("New block : " + str(bloc["index"]))
 
-    @staticmethod
+    """@staticmethod
     def very_authenticity(sender: str, public_key: str, signature: str, msg: str):
         try:
             key = RSA.import_key(base64.b64decode(public_key))
@@ -164,4 +164,4 @@ class Blockchain:
         except ValueError:
             return "sig"
 
-        return "ok"
+        return "ok" """
