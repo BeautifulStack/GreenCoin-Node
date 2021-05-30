@@ -30,9 +30,7 @@ def get_balance(address: str):
 # TODO: remove this for production
 @app.post('/test')
 def test():
-    data = request.get_json()
-    t = jsonify(data)
-    return data["tr"]["tr1"]
+    pass
 
 
 if __name__ == '__main__':

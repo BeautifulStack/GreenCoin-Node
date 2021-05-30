@@ -1,6 +1,8 @@
 import base64
+import time
 from os import path
 from utils.hash import *
+from threading import Thread
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
@@ -25,8 +27,11 @@ class Blockchain:
         self.__chain = chain["chain"]
         self.__last_block_hash = sha256_dict(self.__chain[0])
 
+        """miner = Thread(target=__mine, daemon=True)
+        miner.start()"""
+
     def get_chain(self):
-        return json.dumps({'length': self.__length, 'chain': self.__chain})
+        return {'length': self.__length, 'chain': self.__chain}
 
     def new_transaction(self, body):
         transaction = self.__check_body_transaction(body)
@@ -101,3 +106,11 @@ class Blockchain:
                 balance -= tx[0]
 
         return balance
+
+    def get_open_transactions(self):
+        pass
+
+    """def __mine(self):
+        while True:
+
+            time.sleep(60)  # end"""
