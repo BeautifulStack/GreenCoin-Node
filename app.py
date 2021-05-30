@@ -26,5 +26,10 @@ def new_transaction():
     return blockchain.new_transaction(request.form)
 
 
+@app.get('/balance/<address:str>')
+def get_balance(address: str):
+    return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
+
+
 if __name__ == '__main__':
     app.run()
