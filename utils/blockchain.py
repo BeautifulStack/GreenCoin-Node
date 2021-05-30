@@ -1,7 +1,11 @@
 import base64
 import json
-import hashlib
 from os import path
+from utils.hash import *
+
+from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
 
 
 class Blockchain:
@@ -20,27 +24,65 @@ class Blockchain:
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
-        self.__last_block_hash = base64.b64encode(
-            hashlib.sha256(json.dumps(self.__chain[0]).encode()).digest()).decode()
+        self.__last_block_hash = sha256_dict(self.__chain[0])
 
     def get_chain(self):
         return json.dumps({'length': self.__length, 'chain': self.__chain})
 
     def new_transaction(self, body):
-        if not self.__check_body_transaction(body):
+        transaction = self.__check_body_transaction(body)
+        if not transaction:
             return {"error": "Missing argument(s)"}, 400, {'Content-Type': 'application/json'}
 
-    def __very_authenticity(self, sender, public_key):
-        pass
+        if not self.__very_authenticity(
+                transaction["sender"],
+                body["public_key"],
+                body["signature"],
+                json.dumps(transaction)
+        ):
+            return {"error": "Invalid public key or signature"}, 400, {'Content-Type': 'application/json'}
+
+
+
+        return "ok", 200, {'Content-Type': 'application/json'}
 
     @staticmethod
     def __check_body_transaction(body):
-        condition = "transaction" in body or "signature" in body or "public_key" in body
+        condition = "transaction" in body and "signature" in body and "public_key" in body
         if condition:
-            condition = "sender" in body or "receiver" in body or "public_key" in body or "time" in body
+            transaction = json.loads(body["transaction"])
+            print(transaction)
+            condition = ("sender" in transaction and
+                         "receiver" in transaction and
+                         "amount" in transaction and
+                         "time" in transaction)
             if condition:
-                return True
+                return transaction
             else:
-                return False
+                return None
         else:
+            return None
+
+    @staticmethod
+    def __very_authenticity(sender: str, public_key: str, signature: str, msg: str):
+        try:
+            key = RSA.import_key(base64.b64decode(public_key))
+        except ValueError:
             return False
+
+        address = ripemd160(sha256_str(public_key))
+        if address != sender:
+            return False
+
+        decoded_sig = base64.b64decode(signature)
+        h = SHA256.new(msg.encode())
+        try:
+            pkcs1_15.new(key).verify(h, decoded_sig)
+        except ValueError:
+            return False
+
+        return True
+
+    @staticmethod
+    def get_balance(address):
+        pass
