@@ -11,8 +11,9 @@ from Crypto.Hash import SHA256
 
 class Blockchain:
     __length = 0
+    __tx_length = 0
     __chain = []  # el famoso blockchain
-    __open_transaction = []
+    __open_transactions = []
     __last_block_hash = None
 
     def __init__(self):
@@ -25,10 +26,11 @@ class Blockchain:
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
-        self.__last_block_hash = sha256_dict(self.__chain[0])
+        self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
+        self.__last_block_hash = sha256_dict(self.__chain[-1])
 
-        """miner = Thread(target=__mine, daemon=True)
-        miner.start()"""
+        miner = Thread(target=self.__mine, daemon=True)
+        miner.start()
 
     def get_chain(self):
         return {'length': self.__length, 'chain': self.__chain}
@@ -51,10 +53,9 @@ class Blockchain:
             return {"error": "Not enough funds"}, 400, {'Content-Type': 'application/json'}
 
         # We're good, add transaction to queue
-        self.__open_transaction.append(transaction)
+        self.__open_transactions.append(transaction)
 
-        # return {"new_balance": funds}, 200, {'Content-Type': 'application/json'}
-        return "ok"
+        return {"new_balance": funds}, 200, {'Content-Type': 'application/json'}
 
     @staticmethod
     def __check_body_transaction(body):
@@ -80,7 +81,7 @@ class Blockchain:
             return False
 
         address = ripemd160(sha256_str(public_key))
-        if address != sender:
+        if address is not sender:
             return False
 
         decoded_sig = base64.b64decode(signature)
@@ -94,8 +95,9 @@ class Blockchain:
 
     def get_balance(self, address):
         balance = 0
-        rec_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["receiver"] == address] for bloc in self.__chain]
-        sen_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["sender"] == address] for bloc in self.__chain]
+        rec_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["receiver"] is address] for bloc in self.__chain]
+        sen_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["sender"] is address] for bloc in self.__chain]
+        rec_open_tx = [tx["amount"] for tx in self.__open_transactions if tx["receiver"] is address]
 
         for tx in rec_tx:
             if len(tx) > 0:
@@ -108,9 +110,35 @@ class Blockchain:
         return balance
 
     def get_open_transactions(self):
-        pass
+        return self.__open_transactions
 
-    """def __mine(self):
+    def __mine(self):
         while True:
+            time.sleep(60)  # start
 
-            time.sleep(60)  # end"""
+            if not self.__open_transactions:
+                continue
+
+            bloc = {
+                "index": self.__length,
+            }
+
+    """@staticmethod
+    def very_authenticity(sender: str, public_key: str, signature: str, msg: str):
+        try:
+            key = RSA.import_key(base64.b64decode(public_key))
+        except ValueError:
+            return public_key
+
+        address = ripemd160(sha256_str(public_key))
+        if address != sender:
+            return "hash"
+
+        decoded_sig = base64.b64decode(signature)
+        h = SHA256.new(msg.encode())
+        try:
+            pkcs1_15.new(key).verify(h, decoded_sig)
+        except ValueError:
+            return "sig"
+
+        return "ok" """

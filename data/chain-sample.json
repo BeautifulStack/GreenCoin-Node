@@ -1,11 +1,11 @@
 {
-  "length": 1,
   "chain": [
     {
       "index": 0,
-      "transactions": [],
+      "previous_hash": "Abra Ke-Dabra",
       "time": 0,
-      "previous_hash": "Abra Ke-Dabra"
+      "transactions": []
     }
-  ]
+  ],
+  "length": 1
 }
