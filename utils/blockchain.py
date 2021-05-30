@@ -1,5 +1,4 @@
 import base64
-import json
 from os import path
 from utils.hash import *
 
@@ -42,9 +41,13 @@ class Blockchain:
         ):
             return {"error": "Invalid public key or signature"}, 400, {'Content-Type': 'application/json'}
 
+        funds = self.get_balance(transaction["sender"]) - transaction["amount"]
+        if funds < 0:
+            return {"error": "Not enough funds"}, 400, {'Content-Type': 'application/json'}
 
+        self.__open_transaction.append(transaction)
 
-        return "ok", 200, {'Content-Type': 'application/json'}
+        return {"new_balance": funds}, 200, {'Content-Type': 'application/json'}
 
     @staticmethod
     def __check_body_transaction(body):
@@ -83,6 +86,17 @@ class Blockchain:
 
         return True
 
-    @staticmethod
-    def get_balance(address):
-        pass
+    def get_balance(self, address):
+        balance = 0
+        rec_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["receiver"] == address] for bloc in self.__chain]
+        sen_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["sender"] == address] for bloc in self.__chain]
+
+        for tx in rec_tx:
+            if len(tx) > 0:
+                balance += tx[0]
+
+        for tx in sen_tx:
+            if len(tx) > 0:
+                balance -= tx[0]
+
+        return balance
