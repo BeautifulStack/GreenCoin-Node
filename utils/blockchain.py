@@ -81,7 +81,7 @@ class Blockchain:
             return False
 
         address = ripemd160(sha256_str(public_key))
-        if address is not sender:
+        if address != sender:
             return False
 
         decoded_sig = base64.b64decode(signature)
@@ -95,17 +95,24 @@ class Blockchain:
 
     def get_balance(self, address):
         balance = 0
-        rec_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["receiver"] is address] for bloc in self.__chain]
-        sen_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["sender"] is address] for bloc in self.__chain]
-        rec_open_tx = [tx["amount"] for tx in self.__open_transactions if tx["receiver"] is address]
+        rec_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["receiver"] == address] for bloc in self.__chain]
+        sen_tx = [[tx["amount"] for tx in bloc["transactions"] if tx["sender"] == address] for bloc in self.__chain]
+        rec_open_tx = [tx["amount"] for tx in self.__open_transactions if tx["receiver"] == address]
+        sen_open_tx = [tx["amount"] for tx in self.__open_transactions if tx["sender"] == address]
 
-        for tx in rec_tx:
-            if len(tx) > 0:
-                balance += tx[0]
+        for bloc in rec_tx:
+            for tx in bloc:
+                balance += tx
 
-        for tx in sen_tx:
-            if len(tx) > 0:
-                balance -= tx[0]
+        for tx in rec_open_tx:
+            balance += tx
+
+        for bloc in sen_tx:
+            for tx in bloc:
+                balance -= tx
+
+        for tx in sen_open_tx:
+            balance -= tx
 
         return balance
 
@@ -114,16 +121,32 @@ class Blockchain:
 
     def __mine(self):
         while True:
-            time.sleep(60)  # start
+            time.sleep(20)  # start
 
             if not self.__open_transactions:
                 continue
 
+            print("DEBUG")
+
+            for i, tx in enumerate(self.__open_transactions):
+                tx["index"] = self.__tx_length + i+1
+
             bloc = {
                 "index": self.__length,
+                "previous_hash": self.__last_block_hash,
+                "time": time.time(),
+                "transactions": self.__open_transactions
             }
 
-    """@staticmethod
+            self.__chain.append(bloc)
+            self.__length += 1
+            self.__tx_length += len(self.__open_transactions)
+            self.__last_block_hash = sha256_dict(bloc)
+            self.__open_transactions = []
+
+            print("New block : " + str(bloc["index"]))
+
+    @staticmethod
     def very_authenticity(sender: str, public_key: str, signature: str, msg: str):
         try:
             key = RSA.import_key(base64.b64decode(public_key))
@@ -141,4 +164,4 @@ class Blockchain:
         except ValueError:
             return "sig"
 
-        return "ok" """
+        return "ok"
