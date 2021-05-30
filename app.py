@@ -1,10 +1,10 @@
 from flask import Flask, request
-from utils.keys import KeyPair
+from utils.node import Node
 from utils.blockchain import Blockchain
 
 app = Flask(__name__)
-keys = KeyPair()
-blockchain = Blockchain()
+node = Node()
+blockchain = Blockchain(node)
 
 
 @app.route('/')
@@ -30,6 +30,11 @@ def get_balance(address: str):
 @app.get('/open_transactions')
 def get_open_transactions():
     return {"open_transactions": blockchain.get_open_transactions()}, 200, {'Content-Type': 'application/json'}
+
+
+@app.get('/public_key')
+def get_public_key():
+    return {"public_key": node.display()}, 200, {'Content-Type': 'application/json'}
 
 
 if __name__ == '__main__':

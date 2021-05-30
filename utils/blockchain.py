@@ -1,4 +1,5 @@
 import base64
+import sys
 import time
 import json
 from os import path
@@ -15,19 +16,21 @@ class Blockchain:
     __chain = []  # el famoso blockchain
     __open_transactions = []
     __last_block_hash = None
+    __node = None
 
-    def __init__(self):
-        if not path.exists("data/chain.json"):
-            print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json")
+    def __init__(self, node):
+        if not path.exists(node.chain_path):
+            print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json", file=sys.stderr)
             exit(1)
 
-        with open("data/chain.json", "r") as f:
+        with open(node.chain_path, "r") as f:
             chain = json.load(f)
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
         self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
         self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
+        self.__node = node
 
         miner = Thread(target=self.__mine, daemon=True)
         miner.start()
