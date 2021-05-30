@@ -143,3 +143,5 @@ cython_debug/
 # GreenCoin
 data/private.key
 data/chain.json
+data/chain-test.json
+data/config.json
