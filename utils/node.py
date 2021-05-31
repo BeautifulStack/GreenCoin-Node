@@ -1,6 +1,8 @@
 import base64
 import json
 import sys
+import requests
+from requests.exceptions import HTTPError
 from os import path
 
 import Crypto.Random
@@ -66,3 +68,11 @@ class Node:
 
     def add_peer(self, body):
         pass
+
+    def request_chain(self):
+        try:
+            r = requests.get(f"https://{self.master[1]}/chain")
+        except HTTPError:
+            return
+
+        return r.json()

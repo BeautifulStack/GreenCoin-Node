@@ -34,7 +34,7 @@ def get_open_transactions():
 
 @app.get('/public_key')
 def get_public_key():
-    return {"public_key": node.display()}, 200, {'Content-Type': 'application/json'}
+    return {"public_key": node.display().decode()}, 200, {'Content-Type': 'application/json'}
 
 
 if __name__ == '__main__':
