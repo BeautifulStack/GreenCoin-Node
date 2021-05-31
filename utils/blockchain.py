@@ -20,21 +20,40 @@ class Blockchain:
     __node = None
 
     def __init__(self, node):
-        if not path.exists(node.chain_path):
-            print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json", file=sys.stderr)
-            exit(1)
+        self.__node = node
+        if self.__node.master:
+            if not self.__load_chain():
+                chain = self.__node.request_chain()
 
-        with open(node.chain_path, "r") as f:
+                if not chain:
+                    print("ERR: Couldn't get chain data from master node", file=sys.stderr)
+                    exit(1)
+
+                self.__length = chain["length"]
+                self.__chain = chain["chain"]
+                self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
+                self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
+        else:
+            if not self.__load_chain():
+                print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json", file=sys.stderr)
+                exit(1)
+
+            miner = Thread(target=self.__mine, daemon=True)
+            miner.start()
+
+    def __load_chain(self):
+        if not path.exists(self.__node.chain_path):
+            return False
+
+        with open(self.__node.chain_path, "r") as f:
             chain = json.load(f)
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
         self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
         self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
-        self.__node = node
 
-        miner = Thread(target=self.__mine, daemon=True)
-        miner.start()
+        return True
 
     def get_chain(self):
         return {'length': self.__length, 'chain': self.__chain}

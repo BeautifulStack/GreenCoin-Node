@@ -63,3 +63,6 @@ class Node:
 
     def display(self):
         return base64.b64encode(self.__public_key.export_key("DER"))
+
+    def add_peer(self, body):
+        pass
