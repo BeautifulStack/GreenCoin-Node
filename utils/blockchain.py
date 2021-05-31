@@ -2,6 +2,7 @@ import base64
 import sys
 import time
 import json
+import re
 from os import path
 from utils.hash import *
 from threading import Thread
@@ -54,6 +55,9 @@ class Blockchain:
         funds = self.get_balance(transaction["sender"]) - transaction["amount"]
         if funds < 0:
             return {"error": "Not enough funds"}, 400, {'Content-Type': 'application/json'}
+
+        if not re.fullmatch('[a-f0-9]{40}', transaction["receiver"]):
+            return {"error": "Incorrect receiver"}, 400, {'Content-Type': 'application/json'}
 
         # We're good, add transaction to queue
         self.__open_transactions.append(transaction)
