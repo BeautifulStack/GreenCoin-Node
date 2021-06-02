@@ -9,7 +9,7 @@ blockchain = Blockchain(node)
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return 'Sananes Ke-Dabra'
 
 
 @app.get('/chain')
