@@ -1,13 +1,14 @@
 import base64
 import json
 import sys
-import requests
-from requests.exceptions import HTTPError
 from os import path
 
 import Crypto.Random
+import requests
+from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
+from requests.exceptions import HTTPError
 
 
 class Node:
@@ -76,3 +77,16 @@ class Node:
             return
 
         return r.json()
+
+    def send_block(self, block):
+        sig = base64.b64encode(self.signer.sign(SHA256.new(json.dumps(block).encode())))
+
+        for peer in self.peers:
+            try:
+                requests.post(f"https://{peer}/new_block", json={
+                    "block": block,
+                    "signature": sig,
+                    "public_key": self.__public_key
+                })
+            except HTTPError:
+                continue

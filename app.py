@@ -1,6 +1,7 @@
 from flask import Flask, request
-from utils.node import Node
+
 from utils.blockchain import Blockchain
+from utils.node import Node
 
 app = Flask(__name__)
 node = Node()
@@ -35,6 +36,14 @@ def get_open_transactions():
 @app.get('/public_key')
 def get_public_key():
     return {"public_key": node.display().decode()}, 200, {'Content-Type': 'application/json'}
+
+
+@app.post('/new_block')
+def new_block():
+    if not node.master:
+        return {"error": "Master node doesn't takes new block"}, 400, {'Content-Type': 'application/json'}
+
+    return blockchain.new_block(request.get_json())
 
 
 if __name__ == '__main__':

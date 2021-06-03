@@ -1,14 +1,15 @@
 import base64
-import sys
-import time
 import json
 import re
+import sys
+import time
 from os import path
-from utils.hash import *
 from threading import Thread
 
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
+
+from utils.hash import *
 
 
 class Blockchain:
@@ -77,6 +78,8 @@ class Blockchain:
 
         if not re.fullmatch('[a-f0-9]{40}', transaction["receiver"]):
             return {"error": "Incorrect receiver"}, 400, {'Content-Type': 'application/json'}
+
+        # TODO: check if amount is 0
 
         # We're good, add transaction to queue
         self.__open_transactions.append(transaction)
@@ -153,22 +156,56 @@ class Blockchain:
                 continue
 
             for i, tx in enumerate(self.__open_transactions):
-                tx["index"] = self.__tx_length + (i+1)
+                tx["index"] = self.__tx_length + (i + 1)
 
-            bloc = {
+            block = {
                 "index": self.__length,
                 "previous_hash": self.__last_block_hash,
                 "time": time.time(),
                 "transactions": self.__open_transactions
             }
 
-            self.__chain.append(bloc)
+            self.__chain.append(block)
             self.__length += 1
             self.__tx_length += len(self.__open_transactions)
-            self.__last_block_hash = sha256(json.dumps(bloc))
+            self.__last_block_hash = sha256(json.dumps(block))
             self.__open_transactions = []
 
             with open(self.__node.chain_path, "w") as f:
                 f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
 
-            print(f"New block : {bloc['index']}")
+            self.__node.send_block(block)
+
+            print(f"New block : {block['index']}")
+
+    def __verify_chain(self):
+        # TODO: check the previous hash of each block
+        pass
+
+    def new_block(self, body):
+        try:
+            key = RSA.import_key(base64.b64decode(body["public_key"]))
+        except ValueError:
+            return {"error": "Invalid public key"}, 400, {'Content-Type': 'application/json'}
+
+        decoded_sig = base64.b64decode(body["signature"])
+        h = SHA256.new(json.dumps(body["block"]).encode())
+        try:
+            pkcs1_15.new(key).verify(h, decoded_sig)
+        except ValueError:
+            return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
+
+        if self.__last_block_hash != body["block"]["previous_hash"]:
+            return {"error": "Invalid previous hash"}, 400, {'Content-Type': 'application/json'}
+
+        self.__chain.append(body["block"])
+        self.__length += 1
+        self.__tx_length += len(body["block"]["transactions"])
+        self.__last_block_hash = sha256(json.dumps(body["block"]))
+
+        with open(self.__node.chain_path, "w") as f:
+            f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
+
+        print(f"New block : {body['block']['index']}")
+
+        pass
