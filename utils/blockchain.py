@@ -75,7 +75,8 @@ class Blockchain:
         if not re.fullmatch('[a-f0-9]{40}', transaction["receiver"]):
             return {"error": "Incorrect receiver"}, 400, {'Content-Type': 'application/json'}
 
-        # TODO: check if amount is 0
+        if transaction["amount"] == 0:
+            return {"error": "Wrong amount"}, 400, {'Content-Type': 'application/json'}
 
         # We're good, add transaction to queue
         self.__open_transactions.append(transaction)

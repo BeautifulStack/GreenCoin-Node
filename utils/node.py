@@ -79,10 +79,6 @@ class Node:
         with open("data/private.key", "wb") as f:
             f.write(self.__private_key.export_key("PEM"))
 
-    def sign(self, string) -> str:
-        # TODO: signature process
-        pass
-
     def display(self):
         return base64.b64encode(self.__public_key.export_key("DER"))
 
