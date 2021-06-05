@@ -1,5 +1,6 @@
 {
-  "master": null,
+  "master_host": null,
+  "master_key": null,
   "chain": "data/chain.json",
   "web_key": null,
   "peers": []

@@ -6,10 +6,10 @@ import time
 from os import path
 from threading import Thread
 
-from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 
 from utils.hash import *
+from utils.node import Node
 
 
 class Blockchain:
@@ -22,7 +22,7 @@ class Blockchain:
 
     def __init__(self, node):
         self.__node = node
-        if self.__node.master:
+        if self.__node.master_host:
             if not self.__load_chain():
                 chain = self.__node.request_chain()
 
@@ -104,9 +104,8 @@ class Blockchain:
 
     @staticmethod
     def __very_authenticity(sender: str, public_key: str, signature: str, msg: str):
-        try:
-            key = RSA.import_key(base64.b64decode(public_key))
-        except ValueError:
+        key = Node.read_key(base64.b64decode(public_key))
+        if not key:
             return False
 
         address = ripemd160(sha256(public_key))
@@ -183,9 +182,8 @@ class Blockchain:
         pass
 
     def new_block(self, body):
-        try:
-            key = RSA.import_key(base64.b64decode(body["public_key"]))
-        except ValueError:
+        key = Node.read_key(base64.b64decode(body["public_key"]))
+        if not key:
             return {"error": "Invalid public key"}, 400, {'Content-Type': 'application/json'}
 
         decoded_sig = base64.b64decode(body["signature"])

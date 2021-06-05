@@ -17,7 +17,8 @@ class Node:
     signer = None
     chain_path = None
     peers = []
-    master = None
+    master_host = None
+    master_key = None
     web_key = None
 
     def __init__(self):
@@ -29,21 +30,39 @@ class Node:
             with open("data/config.json", "r") as f:
                 config = json.load(f)
 
-            self.master = config["master"]
+            self.master_host = config["master_host"]  # "<ip_address>:<port>"
             self.chain_path = config["chain"]
-            self.peers = config["peers"]
-            self.web_key = config["web_key"]
+            self.peers = config["peers"]  # ["<ip_address>:<port>"]
+
+            if self.master_host:
+                self.master_key = self.read_key(base64.b64decode(config["master_key"]))
+                if not self.master_key:
+                    print("ERR: Corrupted master key", file=sys.stderr)
+                    exit(1)
+            else:
+                self.web_key = self.read_key(base64.b64decode(config["web_key"]))
+                if not self.web_key:
+                    print("ERR: Corrupted web key", file=sys.stderr)
+                    exit(1)
 
         else:
             print("ERR: Couldn't find config data, copy config-sample.json to config.json", file=sys.stderr)
             exit(1)
 
+    @staticmethod
+    def read_key(key):
+        try:
+            rsa_key = RSA.import_key(key)
+        except ValueError:
+            return None
+
+        return rsa_key
+
     def __import_key(self):
         if path.exists("data/private.key"):
             with open("data/private.key", "r") as f:
-                try:
-                    self.__private_key = RSA.import_key(f.read())
-                except ValueError:
+                self.__private_key = self.read_key(f.read())
+                if not self.__private_key:
                     print("ERR: Corrupted key, delete data folder to generate a new key (CAUTION)", file=sys.stderr)
                     exit(1)
 
@@ -72,7 +91,7 @@ class Node:
 
     def request_chain(self):
         try:
-            r = requests.get(f"https://{self.master[1]}/chain")
+            r = requests.get(f"https://{self.master_host}/chain")
         except HTTPError:
             return
 
