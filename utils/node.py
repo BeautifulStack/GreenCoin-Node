@@ -106,7 +106,7 @@ class Node:
 
     def request_chain(self):
         try:
-            r = requests.get(f"https://{self.master_host}/chain")
+            r = requests.get(f"http://{self.master_host}/chain")
         except HTTPError:
             return
 
