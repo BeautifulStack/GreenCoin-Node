@@ -117,7 +117,7 @@ class Node:
 
         for peer in self.peers:
             try:
-                requests.post(f"https://{peer}/new_block", json={
+                requests.post(f"http://{peer}/new_block", json={
                     "block": block,
                     "signature": sig,
                     "public_key": self.__public_key
