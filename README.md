@@ -6,7 +6,11 @@ GreenCoin Blockchain Node code source
 
 Install python packages :
 
-`pip install -r requirements.txt`
+`$ pip3 install -r requirements.txt`
+
+Initialise config for (master by default) :
+
+`cp data/config-sample.json data/config.json`
 
 Initialise genesis block :
 
@@ -14,4 +18,4 @@ Initialise genesis block :
 
 ## Usage
 
-```python app.py```
+`$ python3 app.py`
