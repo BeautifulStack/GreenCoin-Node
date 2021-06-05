@@ -51,7 +51,7 @@ def new_block():
 
 @app.post('/new_peer')
 def new_peer():
-    pass
+    return node.new_peer(request.get_json())
 
 
 if __name__ == '__main__':

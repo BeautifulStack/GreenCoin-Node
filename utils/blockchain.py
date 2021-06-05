@@ -6,8 +6,6 @@ import time
 from os import path
 from threading import Thread
 
-from Crypto.Signature import pkcs1_15
-
 from utils.hash import *
 from utils.node import Node
 
@@ -112,11 +110,7 @@ class Blockchain:
         if address != sender:
             return False
 
-        decoded_sig = base64.b64decode(signature)
-        h = SHA256.new(msg.encode())
-        try:
-            pkcs1_15.new(key).verify(h, decoded_sig)
-        except ValueError:
+        if not Node.verify_signature(key, signature, msg):
             return False
 
         return True
@@ -186,11 +180,7 @@ class Blockchain:
         if not key:
             return {"error": "Invalid public key"}, 400, {'Content-Type': 'application/json'}
 
-        decoded_sig = base64.b64decode(body["signature"])
-        h = SHA256.new(json.dumps(body["block"]).encode())
-        try:
-            pkcs1_15.new(key).verify(h, decoded_sig)
-        except ValueError:
+        if not Node.verify_signature(key, body["signature"], json.dumps(body["block"])):
             return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
 
         if self.__last_block_hash != body["block"]["previous_hash"]:
@@ -205,5 +195,3 @@ class Blockchain:
             f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
 
         print(f"New block : {body['block']['index']}")
-
-        pass

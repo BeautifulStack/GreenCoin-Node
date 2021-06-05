@@ -86,8 +86,20 @@ class Node:
     def display(self):
         return base64.b64encode(self.__public_key.export_key("DER"))
 
-    def add_peer(self, body):
+    def new_peer(self, body):
+
         pass
+
+    @staticmethod
+    def verify_signature(key, signature, msg):
+        decoded_sig = base64.b64decode(signature)
+        h = SHA256.new(msg.encode())
+        try:
+            pkcs1_15.new(key).verify(h, decoded_sig)
+        except ValueError:
+            return False
+
+        return True
 
     def request_chain(self):
         try:
