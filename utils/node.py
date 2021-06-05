@@ -119,7 +119,7 @@ class Node:
             try:
                 requests.post(f"http://{peer}/new_block", json={
                     "block": block,
-                    "signature": sig,
+                    "signature": sig.decode(),
                     "public_key": self.__public_key
                 })
             except HTTPError:
