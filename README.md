@@ -6,7 +6,7 @@ GreenCoin Blockchain Node code source
 
 Install python packages :
 
-`pip install`
+`pip install -r requirements.txt`
 
 Initialise genesis block :
 
