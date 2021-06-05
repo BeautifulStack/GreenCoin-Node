@@ -195,6 +195,7 @@ class Blockchain:
             f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
 
         print(f"New block : {body['block']['index']}")
+        return "Ok", 200, {'Content-Type': 'application/json'}
 
     def new_reward(self, body):
         transaction = json.dumps(body["transaction"])

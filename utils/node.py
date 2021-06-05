@@ -123,4 +123,5 @@ class Node:
                     "public_key": self.display().decode()
                 })
             except HTTPError:
+                print(f"error sending block to {peer}")
                 continue
