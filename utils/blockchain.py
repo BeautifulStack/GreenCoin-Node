@@ -164,7 +164,6 @@ class Blockchain:
 
             self.__chain.append(block)
             self.__length += 1
-            self.__tx_length += len(self.__open_transactions)
             self.__last_block_hash = sha256(json.dumps(block))
             self.__open_transactions = []
 
@@ -192,7 +191,6 @@ class Blockchain:
 
         self.__chain.append(body["block"])
         self.__length += 1
-        self.__tx_length += len(body["block"]["transactions"])
         self.__last_block_hash = sha256(json.dumps(body["block"]))
 
         with open(self.__node.chain_path, "w") as f:
