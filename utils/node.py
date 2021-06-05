@@ -53,7 +53,7 @@ class Node:
     def read_key(key):
         try:
             rsa_key = RSA.import_key(key)
-        except ValueError:
+        except:
             return None
 
         return rsa_key
