@@ -31,13 +31,13 @@ class Blockchain:
                 self.__chain = chain["chain"]
                 self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
 
-                print(self.__last_block_hash)
+                print(json.dumps(self.__chain[-1]))
         else:
             if not self.__load_chain():
                 print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json", file=sys.stderr)
                 exit(1)
 
-            print(self.__last_block_hash)
+            print(json.dumps(self.__chain[-1]))
 
             miner = Thread(target=self.__mine, daemon=True)
             miner.start()
