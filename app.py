@@ -56,7 +56,7 @@ def new_peer():
 
 @app.post('/new_reward')
 def new_reward():
-    pass
+    return blockchain.new_reward(request.get_json())
 
 
 if __name__ == '__main__':

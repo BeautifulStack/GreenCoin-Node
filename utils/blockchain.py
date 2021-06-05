@@ -195,3 +195,11 @@ class Blockchain:
             f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
 
         print(f"New block : {body['block']['index']}")
+
+    def new_reward(self, body):
+        transaction = json.dumps(body["transaction"])
+        if not Node.verify_signature(self.__node.web_key, body["signature"], transaction):
+            return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
+
+        self.__open_transactions.append(body["transaction"])
+        return "Ok", 200, {'Content-Type': 'application/json'}
