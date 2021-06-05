@@ -12,7 +12,6 @@ from utils.node import Node
 
 class Blockchain:
     __length = 0
-    __tx_length = 0
     __chain = []  # el famoso blockchain
     __open_transactions = []
     __last_block_hash = None
@@ -30,16 +29,15 @@ class Blockchain:
 
                 self.__length = chain["length"]
                 self.__chain = chain["chain"]
-                self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
                 self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
 
-                print(json.dumps(self.__chain[-1]))
+                print(self.__last_block_hash)
         else:
             if not self.__load_chain():
                 print("ERR: Couldn't find chain data, copy chain-sample.json to chain.json", file=sys.stderr)
                 exit(1)
 
-            print(json.dumps(self.__chain[-1]))
+            print(self.__last_block_hash)
 
             miner = Thread(target=self.__mine, daemon=True)
             miner.start()
@@ -53,7 +51,6 @@ class Blockchain:
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
-        self.__tx_length = self.__chain[-1]["transactions"][-1]["index"]
         self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
 
         return True
@@ -147,13 +144,16 @@ class Blockchain:
 
     def __mine(self):
         while True:
-            time.sleep(60)
+            time.sleep(30)
 
             if not self.__open_transactions:
                 continue
 
+            # adding indexes to transactions pissed me off !
+            """transactions = []
             for i, tx in enumerate(self.__open_transactions):
                 tx["index"] = self.__tx_length + (i + 1)
+                transactions.append(sorted(tx.items()))"""
 
             block = {
                 "index": self.__length,
