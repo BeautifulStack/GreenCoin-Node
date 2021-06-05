@@ -114,14 +114,16 @@ class Node:
 
     def send_block(self, block):
         sig = base64.b64encode(self.signer.sign(SHA256.new(json.dumps(block).encode())))
+        print(f"prev hash: {block['previous_hash']}")
 
         for peer in self.peers:
             try:
-                requests.post(f"http://{peer}/new_block", json={
+                r = requests.post(f"http://{peer}/new_block", json={
                     "block": block,
                     "signature": sig.decode(),
                     "public_key": self.display().decode()
                 })
+                print(r.text)
             except HTTPError:
                 print(f"error sending block to {peer}")
                 continue
