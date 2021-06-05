@@ -114,7 +114,6 @@ class Node:
 
     def send_block(self, block):
         sig = base64.b64encode(self.signer.sign(SHA256.new(json.dumps(block).encode())))
-        print(f"prev hash: {block['previous_hash']}")
 
         for peer in self.peers:
             try:
@@ -123,7 +122,6 @@ class Node:
                     "signature": sig.decode(),
                     "public_key": self.display().decode()
                 })
-                print(r.text)
             except HTTPError:
-                print(f"error sending block to {peer}")
+                print(f"error sending block to {peer}", file=sys.stderr)
                 continue
