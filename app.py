@@ -54,5 +54,10 @@ def new_peer():
     return node.new_peer(request.get_json())
 
 
+@app.post('/new_reward')
+def new_reward():
+    pass
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)

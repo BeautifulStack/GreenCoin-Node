@@ -87,8 +87,11 @@ class Node:
         return base64.b64encode(self.__public_key.export_key("DER"))
 
     def new_peer(self, body):
+        if self.verify_signature(self.web_key, body["signature"], body["peer"]):
+            return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
 
-        pass
+        self.peers.append(body["peer"])
+        return "Ok", 200, {'Content-Type': 'application/json'}
 
     @staticmethod
     def verify_signature(key, signature, msg):
