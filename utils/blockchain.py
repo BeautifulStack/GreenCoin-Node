@@ -6,7 +6,6 @@ import time
 from os import path
 from threading import Thread
 
-from utils.hash import *
 from utils.node import Node
 
 
@@ -29,7 +28,7 @@ class Blockchain:
 
                 self.__length = chain["length"]
                 self.__chain = chain["chain"]
-                self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
+                self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1]))
 
         else:
             if not self.__load_chain():
@@ -48,7 +47,7 @@ class Blockchain:
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
-        self.__last_block_hash = sha256(json.dumps(self.__chain[-1]))
+        self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1]))
 
         return True
 
@@ -105,7 +104,7 @@ class Blockchain:
         if not key:
             return False
 
-        address = ripemd160(sha256(public_key))
+        address = Node.calculate_address(public_key)
         if address != sender:
             return False
 
@@ -162,7 +161,7 @@ class Blockchain:
 
             self.__chain.append(block)
             self.__length += 1
-            self.__last_block_hash = sha256(json.dumps(block))
+            self.__last_block_hash = Node.sha256(json.dumps(block))
             self.__open_transactions = []
 
             with open(self.__node.chain_path, "w") as f:
@@ -189,7 +188,7 @@ class Blockchain:
 
         self.__chain.append(body["block"])
         self.__length += 1
-        self.__last_block_hash = sha256(json.dumps(body["block"]))
+        self.__last_block_hash = Node.sha256(json.dumps(body["block"]))
 
         with open(self.__node.chain_path, "w") as f:
             f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))

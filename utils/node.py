@@ -5,7 +5,7 @@ from os import path
 
 import Crypto.Random
 import requests
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA256, RIPEMD160
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 from requests.exceptions import HTTPError
@@ -113,7 +113,7 @@ class Node:
 
         for peer in self.peers:
             try:
-                r = requests.post(f"http://{peer}/new_block", json={
+                requests.post(f"http://{peer}/new_block", json={
                     "block": block,
                     "signature": sig.decode(),
                     "public_key": self.display().decode()
@@ -121,3 +121,11 @@ class Node:
             except HTTPError:
                 print(f"error sending block to {peer}", file=sys.stderr)
                 continue
+
+    @staticmethod
+    def calculate_address(address):
+        return RIPEMD160.new(SHA256.new(address.encode()).digest())
+
+    @staticmethod
+    def sha256(key: str) -> str:
+        return SHA256.new(key.encode()).hexdigest()
