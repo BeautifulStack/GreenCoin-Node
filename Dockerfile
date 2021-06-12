@@ -1,8 +1,10 @@
-FROM python:3.8-alpine3.13
+FROM python:3.8-slim
 
 ADD . /app
 
 WORKDIR /app
+
+RUN apt-get update -y && apt-get install -y gcc
 
 RUN pip install -r requirements.txt
 
