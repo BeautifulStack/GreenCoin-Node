@@ -109,7 +109,7 @@ class Node:
         return r.json()
 
     def send_block(self, block):
-        sig = base64.b64encode(self.signer.sign(SHA256.new(json.dumps(block).encode())))
+        sig = base64.b64encode(self.signer.sign(SHA256.new(json.dumps(block, separators=(',', ':')).encode())))
 
         for peer in self.peers:
             try:

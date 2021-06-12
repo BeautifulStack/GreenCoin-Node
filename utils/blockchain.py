@@ -28,7 +28,7 @@ class Blockchain:
 
                 self.__length = chain["length"]
                 self.__chain = chain["chain"]
-                self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1]))
+                self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1], separators=(',', ':')))
 
         else:
             if not self.__load_chain():
@@ -47,7 +47,7 @@ class Blockchain:
 
         self.__length = chain["length"]
         self.__chain = chain["chain"]
-        self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1]))
+        self.__last_block_hash = Node.sha256(json.dumps(self.__chain[-1], separators=(',', ':')))
 
         return True
 
@@ -63,7 +63,7 @@ class Blockchain:
                 transaction["sender"],
                 body["public_key"],
                 body["signature"],
-                json.dumps(transaction)
+                json.dumps(transaction, separators=(',', ':'))
         ):
             return {"error": "Invalid public key or signature"}, 400, {'Content-Type': 'application/json'}
 
@@ -161,11 +161,11 @@ class Blockchain:
 
             self.__chain.append(block)
             self.__length += 1
-            self.__last_block_hash = Node.sha256(json.dumps(block))
+            self.__last_block_hash = Node.sha256(json.dumps(block, separators=(',', ':')))
             self.__open_transactions = []
 
             with open(self.__node.chain_path, "w") as f:
-                f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
+                f.write(json.dumps({'length': self.__length, 'chain': self.__chain}, separators=(',', ':')))
 
             self.__node.send_block(block)
 
@@ -180,7 +180,7 @@ class Blockchain:
         if not key:
             return {"error": "Invalid public key"}, 400, {'Content-Type': 'application/json'}
 
-        if not Node.verify_signature(key, body["signature"], json.dumps(body["block"])):
+        if not Node.verify_signature(key, body["signature"], json.dumps(body["block"], separators=(',', ':'))):
             return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
 
         if self.__last_block_hash != body["block"]["previous_hash"]:
@@ -188,16 +188,16 @@ class Blockchain:
 
         self.__chain.append(body["block"])
         self.__length += 1
-        self.__last_block_hash = Node.sha256(json.dumps(body["block"]))
+        self.__last_block_hash = Node.sha256(json.dumps(body["block"], separators=(',', ':')))
 
         with open(self.__node.chain_path, "w") as f:
-            f.write(json.dumps({'length': self.__length, 'chain': self.__chain}))
+            f.write(json.dumps({'length': self.__length, 'chain': self.__chain}, separators=(',', ':')))
 
         print(f"New block : {body['block']['index']}")
         return "Ok", 200, {'Content-Type': 'application/json'}
 
     def new_reward(self, body):
-        transaction = json.dumps(body["transaction"])
+        transaction = json.dumps(body["transaction"], separators=(',', ':'))
         if not Node.verify_signature(self.__node.web_key, body["signature"], transaction):
             return {"error": "Invalid signature"}, 400, {'Content-Type': 'application/json'}
 
