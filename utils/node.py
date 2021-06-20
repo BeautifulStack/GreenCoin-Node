@@ -124,7 +124,7 @@ class Node:
 
     @staticmethod
     def calculate_address(address):
-        return RIPEMD160.new(SHA256.new(address.encode()).digest())
+        return RIPEMD160.new(SHA256.new(address.encode()).digest()).hexdigest()
 
     @staticmethod
     def sha256(key: str) -> str:
