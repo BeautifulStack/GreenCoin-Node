@@ -101,7 +101,8 @@ class Blockchain:
     @staticmethod
     def __very_authenticity(sender: str, public_key: str, signature: str, msg: str):
         with open("test.log", "w") as f:
-            print("DEBUG : BEGIN READ KEY", file=f)
+            f.write("DEBUG : BEGIN READ KEY")
+            #print("DEBUG : BEGIN READ KEY", file=f)
             key = Node.read_key(base64.b64decode(public_key))
             if not key:
                 return False
