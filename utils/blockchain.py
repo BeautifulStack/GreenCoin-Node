@@ -100,21 +100,22 @@ class Blockchain:
 
     @staticmethod
     def __very_authenticity(sender: str, public_key: str, signature: str, msg: str):
-        print("DEBUG : BEGIN READ KEY")
-        key = Node.read_key(base64.b64decode(public_key))
-        if not key:
-            return False
-        print("DEBUG : END READ KEY")
+        with open("test.log", "a+") as f:
+            print("DEBUG : BEGIN READ KEY", file=f)
+            key = Node.read_key(base64.b64decode(public_key))
+            if not key:
+                return False
+            print("DEBUG : END READ KEY", file=f)
 
-        address = Node.calculate_address(public_key)
-        print("DEBUG : "+address+" = "+sender)
-        if address != sender:
-            return False
+            address = Node.calculate_address(public_key)
+            print("DEBUG : " + address + " = " + sender, file=f)
+            if address != sender:
+                return False
 
-        print("DEBUG : BEGIN VERIFY SIG")
-        if not Node.verify_signature(key, signature, msg):
-            return False
-        print("DEBUG : END VERIFY SIG")
+            print("DEBUG : BEGIN VERIFY SIG", file=f)
+            if not Node.verify_signature(key, signature, msg):
+                return False
+            print("DEBUG : END VERIFY SIG", file=f)
 
         return True
 
