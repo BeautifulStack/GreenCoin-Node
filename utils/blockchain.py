@@ -203,3 +203,16 @@ class Blockchain:
 
         self.__open_transactions.append(body["transaction"])
         return "Ok", 200, {'Content-Type': 'application/json'}
+
+    def get_transactions(self, address):
+        list_tx = [
+            [tx for tx in bloc["transactions"] if (tx["receiver"] == address or tx["sender"] == address)]
+            for bloc in self.__chain
+        ]
+
+        final_list = []
+        for block in list_tx:
+            for tr in block:
+                final_list.append(tr)
+
+        return final_list

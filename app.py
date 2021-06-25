@@ -25,6 +25,11 @@ def new_transaction():
     return blockchain.new_transaction(request.get_json())
 
 
+@app.get('/transactions/<address>')
+def get_transactions(address: str):
+    return {"transactions": blockchain.get_transactions(address)}
+
+
 @app.get('/balance/<address>')
 def get_balance(address: str):
     return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
