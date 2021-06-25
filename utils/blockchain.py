@@ -212,7 +212,9 @@ class Blockchain:
 
         final_list = []
         for block in list_tx:
-            for tr in block:
-                final_list.append(tr)
+            if len(final_list) < 5:
+                for tr in block:
+                    if len(final_list) < 5:
+                        final_list.append(tr)
 
         return final_list
