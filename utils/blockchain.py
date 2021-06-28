@@ -210,8 +210,11 @@ class Blockchain:
             for bloc in self.__chain
         ]
 
+        list_tx.reverse()
+
         final_list = []
         for block in list_tx:
+            block.reverse()
             if len(final_list) < 5:
                 for tr in block:
                     if len(final_list) < 5:
