@@ -32,7 +32,10 @@ def get_transactions(address: str):
 
 @app.get('/balance/<address>')
 def get_balance(address: str):
-    return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
+    return {"balance": blockchain.get_balance(address)}, 200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    }
 
 
 @app.get('/open_transactions')
