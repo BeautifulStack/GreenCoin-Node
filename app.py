@@ -1,11 +1,14 @@
 import os
 
 from flask import Flask, request
+from flask_cors import CORS, cross_origin
 
 from utils.blockchain import Blockchain
 from utils.node import Node
 
 app = Flask(__name__)
+CORS(app)
+
 node = Node()
 blockchain = Blockchain(node)
 
@@ -32,10 +35,7 @@ def get_transactions(address: str):
 
 @app.get('/balance/<address>')
 def get_balance(address: str):
-    return {"balance": blockchain.get_balance(address)}, 200, {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-    }
+    return {"balance": blockchain.get_balance(address)}, 200, {'Content-Type': 'application/json'}
 
 
 @app.get('/open_transactions')
